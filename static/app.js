@@ -277,7 +277,7 @@
                     setPhaseStatus(i, 'failed');
                 }
             }
-        } else if (message.indexOf('[OTP] Waiting for OTP') !== -1) {
+        } else if (message.indexOf('[OTP] Waiting for OTP') !== -1 || message.indexOf('OTP field detected') !== -1) {
             showSection(otpSection);
             otpInput.focus();
         }

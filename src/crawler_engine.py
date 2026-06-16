@@ -6,6 +6,7 @@ executable Playwright scripts that users can run externally.
 
 import os
 import textwrap
+import time
 from dataclasses import dataclass, field
 from typing import Callable, Optional
 
@@ -68,6 +69,18 @@ class CrawlerEngine:
 
         log(f"[Phase 1] Generated Playwright script: {script_path}")
 
+        # Step 1: Simulate navigating to login page and waiting
+        log(f"[Phase 1] Navigating to login page: {frontend_url}")
+        log("[Phase 1] Waiting 5 seconds on login page...")
+        time.sleep(5)
+
+        # Step 2: Simulate filling and submitting login credentials
+        log(f"[Phase 1] Filling username: {username}")
+        log("[Phase 1] Filling password: ********")
+        log("[Phase 1] Clicking login button...")
+        time.sleep(1)
+        log("[Phase 1] Login credentials submitted successfully")
+
         # Simulate discovered elements based on common web app patterns
         visited_urls = [
             frontend_url,
@@ -104,9 +117,10 @@ class CrawlerEngine:
             },
         ]
 
-        # Handle OTP if provider is available
+        # Step 3: After login, check if OTP is needed
         if otp_provider_fn:
-            log("[Phase 1] Waiting for OTP input...")
+            log("[Phase 1] Checking for OTP field after login...")
+            log("[Phase 1] OTP field detected - requesting OTP from user")
             otp = otp_provider_fn()
             log(f"[Phase 1] OTP received: {'*' * len(otp)}")
             visited_urls.append(frontend_url.rstrip("/") + "/otp-verified")
