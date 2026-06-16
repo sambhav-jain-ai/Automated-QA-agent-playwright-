@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playwright Automation Test Tool</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1 class="header-title">Playwright Automation Test Tool</h1>
+            <p class="header-subtitle">Automated UI crawling, API testing, and AI-powered retry analysis</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Form Card -->
+        <section class="card form-card">
+            <h2 class="card-title">Test Configuration</h2>
+            <form id="testForm">
+                <div class="form-group">
+                    <label for="frontendUrl">Frontend URL <span class="required">*</span></label>
+                    <input type="url" id="frontendUrl" name="frontendUrl" placeholder="https://example.com" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="username">Username <span class="required">*</span></label>
+                        <input type="text" id="username" name="username" placeholder="test@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password <span class="required">*</span></label>
+                        <input type="password" id="password" name="password" placeholder="Enter password" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="backendUrl">Backend / API Base URL <span class="optional">(optional)</span></label>
+                    <input type="url" id="backendUrl" name="backendUrl" placeholder="https://api.example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="fileUpload">Excel Test Plan (.xlsx) <span class="optional">(optional)</span></label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="fileUpload" name="file" accept=".xlsx">
+                        <span class="file-upload-label" id="fileLabel">Choose .xlsx file or drag here</span>
+                    </div>
+                </div>
+
+                <button type="submit" id="startBtn" class="btn btn-primary btn-large">
+                    <span class="btn-icon">&#9654;</span> Start Test
+                </button>
+            </form>
+        </section>
+
+        <!-- Phase Progress -->
+        <section class="card phase-card" id="phaseSection" style="display: none;">
+            <h2 class="card-title">Test Progress</h2>
+            <div class="phase-indicators">
+                <div class="phase-step" id="phase1" data-status="pending">
+                    <div class="phase-number">1</div>
+                    <div class="phase-info">
+                        <span class="phase-name">UI Crawl</span>
+                        <span class="phase-status" id="phase1Status">Pending</span>
+                    </div>
+                </div>
+                <div class="phase-connector"></div>
+                <div class="phase-step" id="phase2" data-status="pending">
+                    <div class="phase-number">2</div>
+                    <div class="phase-info">
+                        <span class="phase-name">API Test</span>
+                        <span class="phase-status" id="phase2Status">Pending</span>
+                    </div>
+                </div>
+                <div class="phase-connector"></div>
+                <div class="phase-step" id="phase3" data-status="pending">
+                    <div class="phase-number">3</div>
+                    <div class="phase-info">
+                        <span class="phase-name">AI Retry</span>
+                        <span class="phase-status" id="phase3Status">Pending</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OTP Section -->
+        <section class="card otp-card" id="otpSection" style="display: none;">
+            <h2 class="card-title">OTP Required</h2>
+            <p class="otp-message">The application requires a One-Time Password. Please enter the OTP below:</p>
+            <div class="otp-form">
+                <input type="text" id="otpInput" placeholder="Enter OTP code" maxlength="10" autocomplete="one-time-code">
+                <button type="button" id="otpSubmitBtn" class="btn btn-secondary">Submit OTP</button>
+            </div>
+        </section>
+
+        <!-- Live Log Section -->
+        <section class="card log-card" id="logSection" style="display: none;">
+            <h2 class="card-title">Live Log</h2>
+            <div class="log-container" id="logContainer">
+                <div class="log-content" id="logContent"></div>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section class="card results-card" id="resultsSection" style="display: none;">
+            <h2 class="card-title">Results</h2>
+            <div class="results-actions">
+                <a id="reportLink" href="#" class="btn btn-success" target="_blank">
+                    <span class="btn-icon">&#128196;</span> View Full Report
+                </a>
+                <a id="reportDownload" href="#" class="btn btn-outline" download>
+                    <span class="btn-icon">&#11015;</span> Download Report
+                </a>
+                <a id="scriptDownload" href="#" class="btn btn-outline" download>
+                    <span class="btn-icon">&#128190;</span> Download Script
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>Playwright Automation Test Tool &mdash; Automated Testing Suite</p>
+        </div>
+    </footer>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

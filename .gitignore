@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Runtime generated files
+reports/*.html
+!reports/.gitkeep
+screenshots/*.png
+!screenshots/.gitkeep
+uploads/*
+!uploads/.gitkeep
+generated_scripts/*.py
+!generated_scripts/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
