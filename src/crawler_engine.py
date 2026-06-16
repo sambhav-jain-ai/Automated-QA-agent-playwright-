@@ -257,9 +257,9 @@ class CrawlerEngine:
 
                 log("[Phase 1] Login credentials submitted successfully")
 
-                # Step 6: Wait for page to respond after login
-                log("[Phase 1] Waiting for page response after login...")
-                page.wait_for_timeout(3000)
+                # Step 6: Wait for page to respond after login (30s to avoid 429 rate limiting)
+                log("[Phase 1] Waiting 30 seconds for page response after login...")
+                page.wait_for_timeout(30000)
 
                 # Take screenshot after login attempt
                 screenshot_path = os.path.join(self.screenshots_dir, f"{session_id}_02_after_login.png")
@@ -332,7 +332,7 @@ class CrawlerEngine:
                             except Exception:
                                 continue
 
-                        page.wait_for_timeout(3000)
+                        page.wait_for_timeout(10000)
 
                         # Screenshot after OTP
                         screenshot_path = os.path.join(self.screenshots_dir, f"{session_id}_03_after_otp.png")
@@ -387,7 +387,7 @@ class CrawlerEngine:
                         if href and not href.startswith("javascript:") and not href.startswith("#"):
                             log(f"[Phase 1] Navigating to: {href}")
                             link.click()
-                            page.wait_for_timeout(2000)
+                            page.wait_for_timeout(7000)
                             nav_url = page.url
                             if nav_url not in visited_urls:
                                 visited_urls.append(nav_url)
@@ -397,7 +397,7 @@ class CrawlerEngine:
                             page.screenshot(path=screenshot_path)
                             screenshots.append(screenshot_path)
                             page.go_back()
-                            page.wait_for_timeout(1000)
+                            page.wait_for_timeout(5000)
                     except Exception as e:
                         log(f"[Phase 1] Warning: Error navigating link: {e}")
 
@@ -453,7 +453,7 @@ class CrawlerEngine:
         log(f"[Phase 1] Filling username: {username}")
         log("[Phase 1] Filling password: ********")
         log("[Phase 1] Clicking login button...")
-        time.sleep(1)
+        time.sleep(30)
         log("[Phase 1] Login credentials submitted successfully")
 
         # Simulate discovered elements based on common web app patterns
@@ -608,7 +608,7 @@ class CrawlerEngine:
                         except Exception:
                             continue
 
-                    await page.wait_for_timeout(3000)
+                    await page.wait_for_timeout(30000)
                     await page.screenshot(path="screenshots/02_after_login.png")
 
                     # Wait for OTP if needed
@@ -649,7 +649,7 @@ class CrawlerEngine:
                             submit = await page.query_selector('button[type="submit"]')
                             if submit:
                                 await submit.click()
-                            await page.wait_for_timeout(3000)
+                            await page.wait_for_timeout(10000)
 
                     await page.screenshot(path="screenshots/03_dashboard.png")
 
@@ -679,12 +679,12 @@ class CrawlerEngine:
                             if href and not href.startswith("javascript:") and not href.startswith("#"):
                                 print(f"[Crawl] Navigating to: {{href}}")
                                 await link.click()
-                                await page.wait_for_timeout(2000)
+                                await page.wait_for_timeout(7000)
                                 await page.screenshot(
                                     path=f"screenshots/{{i+4:02d}}_page.png"
                                 )
                                 await page.go_back()
-                                await page.wait_for_timeout(1000)
+                                await page.wait_for_timeout(5000)
                         except Exception as e:
                             print(f"[Crawl] Error clicking link: {{e}}")
 
