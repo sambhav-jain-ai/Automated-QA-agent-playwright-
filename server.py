@@ -4,7 +4,6 @@ Uses Python stdlib http.server. Serves static files and API routes.
 Run: python3 server.py
 """
 
-import cgi
 import io
 import json
 import mimetypes
@@ -384,29 +383,27 @@ class AutoTestHandler(BaseHTTPRequestHandler):
             return
 
         try:
-            # Parse multipart form data
-            environ = {
-                "REQUEST_METHOD": "POST",
-                "CONTENT_TYPE": content_type,
-                "CONTENT_LENGTH": self.headers.get("Content-Length", "0"),
-            }
             body = self._read_body()
-            fs = cgi.FieldStorage(
-                fp=io.BytesIO(body),
-                headers=self.headers,
-                environ=environ,
-            )
+
+            # Extract boundary from Content-Type header
+            boundary = self._extract_boundary(content_type)
+            if not boundary:
+                self._send_error_json("Missing boundary in Content-Type")
+                return
+
+            # Parse multipart form data manually
+            parts = self._parse_multipart(body, boundary)
 
             # Get session ID and file
             session_id = ""
             file_data = None
 
-            if "sessionId" in fs:
-                session_id = fs["sessionId"].value
-            if "file" in fs:
-                file_item = fs["file"]
-                if file_item.file:
-                    file_data = file_item.file.read()
+            for part in parts:
+                name = part.get("name", "")
+                if name == "sessionId":
+                    session_id = part["data"].decode("utf-8").strip()
+                elif name == "file":
+                    file_data = part["data"]
 
             if not session_id:
                 session_id = str(uuid.uuid4())
@@ -429,6 +426,91 @@ class AutoTestHandler(BaseHTTPRequestHandler):
 
         except Exception as e:
             self._send_error_json(f"Upload failed: {str(e)}")
+
+    @staticmethod
+    def _extract_boundary(content_type: str) -> Optional[str]:
+        """Extract the boundary string from a multipart Content-Type header."""
+        for part in content_type.split(";"):
+            part = part.strip()
+            if part.startswith("boundary="):
+                boundary = part[len("boundary="):]
+                # Remove optional quotes
+                if boundary.startswith('"') and boundary.endswith('"'):
+                    boundary = boundary[1:-1]
+                return boundary
+        return None
+
+    @staticmethod
+    def _parse_multipart(body: bytes, boundary: str) -> list[dict[str, Any]]:
+        """Parse multipart/form-data body into a list of parts.
+
+        Each part is a dict with keys: name, filename (optional), data (bytes).
+        """
+        parts: list[dict[str, Any]] = []
+        boundary_bytes = boundary.encode("utf-8")
+        delimiter = b"--" + boundary_bytes
+        end_delimiter = delimiter + b"--"
+
+        # Split body by boundary delimiter
+        # The body format is:
+        #   --boundary\r\n
+        #   headers\r\n
+        #   \r\n
+        #   data\r\n
+        #   --boundary\r\n
+        #   ...
+        #   --boundary--\r\n
+        segments = body.split(delimiter)
+
+        for segment in segments:
+            # Skip the preamble (before first boundary) and epilogue (after final --)
+            if not segment or segment == b"--" or segment == b"--\r\n":
+                continue
+            # Remove leading \r\n
+            if segment.startswith(b"\r\n"):
+                segment = segment[2:]
+            # Remove trailing \r\n before next boundary
+            if segment.endswith(b"\r\n"):
+                segment = segment[:-2]
+            # Skip the end marker
+            if segment.startswith(b"--"):
+                continue
+
+            # Split headers from data at the first blank line
+            header_end = segment.find(b"\r\n\r\n")
+            if header_end == -1:
+                continue
+
+            header_block = segment[:header_end].decode("utf-8", errors="replace")
+            data = segment[header_end + 4:]
+
+            # Parse Content-Disposition to get name and filename
+            name = ""
+            filename = ""
+            for line in header_block.split("\r\n"):
+                lower_line = line.lower()
+                if lower_line.startswith("content-disposition:"):
+                    # Extract name
+                    name_start = line.find('name="')
+                    if name_start != -1:
+                        name_start += len('name="')
+                        name_end = line.find('"', name_start)
+                        if name_end != -1:
+                            name = line[name_start:name_end]
+                    # Extract filename
+                    fname_start = line.find('filename="')
+                    if fname_start != -1:
+                        fname_start += len('filename="')
+                        fname_end = line.find('"', fname_start)
+                        if fname_end != -1:
+                            filename = line[fname_start:fname_end]
+
+            part_info: dict[str, Any] = {"name": name, "data": data}
+            if filename:
+                part_info["filename"] = filename
+            parts.append(part_info)
+
+        return parts
 
     def _handle_otp(self) -> None:
         """Handle POST /api/otp - provide OTP for a session."""
